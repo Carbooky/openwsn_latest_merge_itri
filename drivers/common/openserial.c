@@ -24,6 +24,10 @@
 #include "icmpv6echo.h"
 #include "sf0.h"
 
+//=========================== self defines =======================================
+//#define UART_DNOT_PRINT_STATUS  // to refrain openserial.c from using "...printStatus()"
+
+
 //=========================== variables =======================================
 
 openserial_vars_t openserial_vars;
@@ -99,6 +103,27 @@ void openserial_init() {
     );
 }
 
+owerror_t my_openserial_printStatus(uint8_t statusElement,uint8_t* buffer, uint8_t length) {
+   uint8_t i;
+   INTERRUPT_DECLARATION();
+
+   DISABLE_INTERRUPTS();
+   openserial_vars.outputBufFilled  = TRUE;
+   outputHdlcOpen();
+   outputHdlcWrite(0x11);
+   outputHdlcWrite(idmanager_getMyID(ADDR_16B)->addr_16b[0]);
+   outputHdlcWrite(idmanager_getMyID(ADDR_16B)->addr_16b[1]);
+   outputHdlcWrite(statusElement);
+   for (i=0;i<length;i++){
+      outputHdlcWrite(buffer[i]);
+   }
+   outputHdlcClose();
+   ENABLE_INTERRUPTS();
+
+   return E_SUCCESS;
+}
+
+
 void openserial_register(openserial_rsvpt* rsvp) {
     // FIXME: register multiple commands (linked list)
     openserial_vars.registeredCmd = rsvp;
@@ -106,6 +131,13 @@ void openserial_register(openserial_rsvpt* rsvp) {
 
 //===== printing
 
+#ifdef UART_DNOT_PRINT_STATUS
+owerror_t openserial_printStatus(uint8_t statusElement,uint8_t* buffer, uint8_t length) {
+
+   return E_SUCCESS;
+}
+
+#else
 owerror_t openserial_printStatus(
     uint8_t             statusElement,
     uint8_t*            buffer,
@@ -129,6 +161,7 @@ owerror_t openserial_printStatus(
     
     return E_SUCCESS;
 }
+#endif
 
 owerror_t openserial_printInfo(
     uint8_t             calling_component,
@@ -308,7 +341,10 @@ void openserial_startInput() {
     );
     openserial_vars.reqFrameIdx = sizeof(openserial_vars.reqFrame);
 #else
+#ifdef UART_DNOT_PRINT_STATUS
+#else
     uart_writeByte(openserial_vars.reqFrame[openserial_vars.reqFrameIdx]);
+#endif
 #endif
     ENABLE_INTERRUPTS();
 }

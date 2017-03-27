@@ -127,6 +127,11 @@ owerror_t openserial_printStatus(
     uint8_t*            buffer,
     uint8_t             length
 );
+owerror_t my_openserial_printStatus(
+    uint8_t 		statusElement,
+    uint8_t* 		buffer, 
+    uint8_t 		length
+);
 owerror_t openserial_printInfo(
     uint8_t             calling_component,
     uint8_t             error_code,

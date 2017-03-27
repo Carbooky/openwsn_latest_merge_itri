@@ -98,4 +98,13 @@ bool          debugPrint_neighbors(void);
 \}
 */
 
+// force migrate from old version, Bruce
+void neighbors_getNshortAddrnRSSI(uint8_t* ptr);
+bool my_neighbors_getTxTxAck(open_addr_t* macToCompare, uint8_t* numTx, uint8_t* numTxAck);
+
+static const uint8_t ipAddr_Root[] = {0xbb, 0xbb, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, \
+                                      0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x01};
+
+
+
 #endif

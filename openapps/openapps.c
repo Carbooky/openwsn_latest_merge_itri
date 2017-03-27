@@ -19,6 +19,7 @@
 // UDP
 #include "uecho.h"
 #include "uinject.h"
+#include "my_common.h"
 
 //=========================== variables =======================================
 
@@ -41,4 +42,6 @@ void openapps_init(void) {
    techo_init();
    // UDP
 //   uecho_init();
+   usaki_init();
+   uinject_init();
 }

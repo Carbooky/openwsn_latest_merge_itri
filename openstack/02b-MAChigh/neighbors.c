@@ -5,6 +5,7 @@
 #include "idmanager.h"
 #include "openserial.h"
 #include "IEEE802154E.h"
+#include "my_common.h"
 
 //=========================== variables =======================================
 
@@ -58,6 +59,40 @@ uint8_t neighbors_getNumNeighbors() {
    }
    return returnVal;
 }
+
+/**
+  retrieve Tx, TxAck by mac addr
+*/
+bool my_neighbors_getTxTxAck(open_addr_t* macToCompare, uint8_t* numTx, uint8_t* numTxAck) {
+  int i;
+  //int j;
+  //bool macTheSame = FALSE;
+
+  if(macToCompare->type != ADDR_64B)
+    return FALSE;
+
+  // go through each neighbor
+  for (i=0; i<MAXNUMNEIGHBORS; i++) {
+      if (neighbors_vars.neighbors[i].used==TRUE){
+        // check if it is 64B type
+        if(neighbors_vars.neighbors[i].addr_64b.type != ADDR_64B)
+           continue;
+        // compare each byte with address
+        //for(j=0; j<8; j++){
+        if(memcmp(macToCompare->addr_64b, neighbors_vars.neighbors[i].addr_64b.addr_64b, 8) == 0){
+           memcpy(numTx, &(neighbors_vars.neighbors[i].numTx), 1);
+           memcpy(numTxAck, &(neighbors_vars.neighbors[i].numTxACK), 1);
+           return TRUE;
+        }
+           //if(macToCompare->addr_64b[j]==neighbors_vars.neighbors[i].addr_64b[j])
+        //}
+      }
+  }
+  return FALSE;
+}
+
+
+
 
 dagrank_t neighbors_getNeighborRank(uint8_t index) {
    return neighbors_vars.neighbors[index].DAGrank;
@@ -537,6 +572,28 @@ bool debugPrint_neighbors() {
    openserial_printStatus(STATUS_NEIGHBORS,(uint8_t*)&temp,sizeof(debugNeighborEntry_t));
    return TRUE;
 }
+
+void neighbors_getNshortAddrnRSSI(uint8_t* ptr){
+        uint8_t   i;
+        uint8_t   numNeighbors;
+
+        numNeighbors = 0;
+        for (i=0; i<MAXNUMNEIGHBORS; i++) {
+                if (neighbors_vars.neighbors[i].used==TRUE){
+                memcpy( ptr,&(neighbors_vars.neighbors[i].addr_64b.addr_64b[6]),2);
+                ptr += 2;
+
+                memcpy( ptr,&(neighbors_vars.neighbors[i].rssi),1);
+                ptr++;
+
+                numNeighbors++;
+                if(numNeighbors>=MAX_ALLOW_NEIGHBORS)
+                        break;
+                }
+        }
+}
+
+
 
 //=========================== private =========================================
 
