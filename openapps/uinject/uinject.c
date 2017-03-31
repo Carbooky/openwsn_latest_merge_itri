@@ -81,8 +81,8 @@ void uinject_init() {
    uinject_vars.reTxNum = 0;
    uinject_vars.counter = 1;
    uinject_vars.rtnCounter = 0;
-   uinject_vars.uinject_period_time = UPLOAD_PERIOD_TIME_45MS;
-   uinject_vars.uinject_period_time_code = UINJECT_SET_ULTIME_45_ABS;
+   uinject_vars.uinject_period_time = UPLOAD_PERIOD_TIME_5MS;
+   uinject_vars.uinject_period_time_code = UINJECT_SET_ULTIME_5_ABS;
    
    // start periodic timer
    uinject_vars.timerId                    = opentimers_start(
